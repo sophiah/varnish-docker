@@ -1,0 +1,9 @@
+version: "3.3"
+
+services:
+  varnish-mod:
+    build: .
+    user: root
+    container_name: varnish-mod
+    image: varnish:7.1
+    command: tail -f /dev/null
