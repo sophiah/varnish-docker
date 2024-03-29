@@ -2,8 +2,11 @@ version: "3.3"
 
 services:
   varnish-mod:
-    build: .
+    build:
+      dockerfile: Dockerfile
+      target: varnish_mod_dev
     user: root
-    container_name: varnish-mod
-    image: varnish:7.1
+    container_name: varnish-mod-dev
     command: tail -f /dev/null
+    volumes: 
+      - ./plugins/:/home/varnish/plugins
