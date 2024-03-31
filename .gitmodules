@@ -1,0 +1,3 @@
+[submodule "plugins/libvmod-awsrest"]
+	path = plugins/libvmod-awsrest
+	url = git@github.com:sophiah/libvmod-awsrest.git

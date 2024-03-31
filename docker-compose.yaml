@@ -1,12 +1,53 @@
 version: "3.3"
 
+# Settings and configurations that are common for all containers
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2024-03-26T22-10-45Z
+  command: server --console-address ":9001" http://minio/data{1...2}
+  expose:
+    - "9000"
+    - "9001"
+  environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+  healthcheck:
+    test: ["CMD", "mc", "ready", "local"]
+    interval: 5s
+    timeout: 5s
+    retries: 5
+
+x-varnish-common: &varnish-common
+  user: root
+  command: tail -f /dev/null
+  volumes: 
+    - ./plugins/:/home/varnish/plugins
+    - ./etc-varnish:/etc/varnish
+
+
 services:
-  varnish-mod:
+  varnish-mod-dev:
+    <<: *varnish-common
+    container_name: varnish-mod-dev
+    ports:
+      - 80:80
     build:
       dockerfile: Dockerfile
       target: varnish_mod_dev
-    user: root
-    container_name: varnish-mod-dev
-    command: tail -f /dev/null
-    volumes: 
-      - ./plugins/:/home/varnish/plugins
+
+  varnish-mod:
+    <<: *varnish-common
+    container_name: varnish-mod
+    build:
+      dockerfile: Dockerfile
+      target: varnish_mod
+
+  minio:
+    <<: *minio-common
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio-vol/data1:/data1
+      - ./minio-vol/data2:/data2
+
